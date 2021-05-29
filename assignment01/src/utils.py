@@ -7,6 +7,7 @@ def report(i, x1, y1, delta_x, delta_y):
     print(f"i={i}: f({x1})={y1}, dx={delta_x}, dy={delta_y}")
 
 def plot_it(f, path, step_size, title, done):
+    steps = len(path)    
     if len(path) > 300:
         path = path[:30] + path[-30:]
     min_i, max_i = min(x[0] for x, _, _ in path), max(x[0] for x, _, _ in path)
@@ -21,7 +22,7 @@ def plot_it(f, path, step_size, title, done):
     fig, ax = plt.subplots()
     CS = ax.contour(I, J, Z)
     ax.clabel(CS, inline=True, fontsize=10)
-    ax.set_title(title + f", converged={done}, steps={len(path)}")
+    ax.set_title(title + f", converged={done}, steps={steps}")
     ax.scatter([x[0] for x, _, _ in path], [x[1] for x, _, _ in path])
     for x, y, grad in path:
         ax.arrow(x[0], x[1], -grad[0]*step_size*0.5, -grad[1]*step_size*0.5, head_width=abs(grad[0]*step_size*0.3))
