@@ -8,6 +8,7 @@ def main():
     ap.add_argument("-m", "--max_seconds", default=60, type=int, help="max seconds for the optimizer")
     ap.add_argument("-c", "--cuts", default=-1, type=int, help="generate cuts")
     ap.add_argument("-p", "--preprocess", default=-1, type=int, help="do preprocess")
+    ap.add_argument("-a", "--alpha", default=0.01, type=float, help="next_leaf objective vs. num_ints")
     ap.add_argument("-l", "--lp_method", choices=['primal_simplex', 'dual_simplex', 'barrier'], 
         help="lp_method 0=auto/1=dual_simplex/2=primal_simplex/3=barrier")
     ap.add_argument("-s", "--solver", required=True, choices=['cbc', 'ido'])
@@ -31,9 +32,10 @@ def cbc_solver(args):
 
 
 # globals (yuck) for my_solver
+INF = 9999999
 on_tree = []
-best_solution = 9999999
-best_possible = -9999999
+best_solution = INF
+best_possible = -INF
 fathomed = 0
 
 
@@ -64,7 +66,9 @@ def my_solver(args):
         iters += 1
         if iters % 100 == 0:
             elapsed = time.time() - start
-        on_tree.sort(key=lambda m: -num_ints_in_model(m))
+        effective_alpha = args['alpha'] if best_solution < INF else 0.0
+        on_tree.sort(key=lambda m: -(1-effective_alpha)*num_ints_in_model(m) + 
+            effective_alpha*(m.objective_value or INF))
     print(f'After {iters} nodes, {len(on_tree)} on tree, {best_solution} best solution, '
         f'best possible {best_possible} ({time.time() - start} seconds)')
 
