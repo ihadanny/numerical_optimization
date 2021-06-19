@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
-def report(i, x1, y1, delta_x, delta_y):
-    print(f"i={i}: f({x1})={y1}, dx={delta_x}, dy={delta_y}")
+def report(i, pk, x1, y1, delta_x, delta_y, alpha):
+    print(f"i={i}: pk={pk}, f({x1})={y1}, dx={delta_x}, dy={delta_y}, alpha={alpha}")
 
-def plot_it(f, path, title, done):
+def plot_it(ax, f, path, title, done):
     steps = len(path)    
     if len(path) > 300:
         path = path[:30] + path[-30:]
@@ -19,7 +19,6 @@ def plot_it(f, path, title, done):
     X = np.vstack((np.ravel(I), np.ravel(J))).T
     Z = np.array([f(exam)[0] for exam in X])
     Z = Z.reshape(I.shape)
-    fig, ax = plt.subplots()
     CS = ax.contour(I, J, Z)
     ax.clabel(CS, inline=True, fontsize=10)
     ax.set_title(title + f", converged={done}, steps={steps}")
@@ -27,11 +26,14 @@ def plot_it(f, path, title, done):
     for i, (x, y, grad, hess) in enumerate(path[:-1]):
         xn, _, _, _ = path[i+1]
         step_size = np.sqrt((xn[0]-x[0])**2 + (xn[1]-x[1])**2)
-        ax.arrow(x[0], x[1], -grad[0]*step_size*0.5, -grad[1]*step_size*0.5, head_width=abs(grad[0]*step_size*0.3))
+        ax.arrow(x[0], x[1], xn[0]-x[0], xn[1]-x[1], length_includes_head=True, head_width=step_size*0.1)
     last_x1, last_x2 = path[-1][0][0], path[-1][0][1]
     ax.plot(last_x1, last_x2, 'ro', label=f"{last_x1}, {last_x2}")
-    plt.legend()        
-    plt.savefig(fname=title + '.png')
-    plt.show()
+    ax.legend()        
 
+def plot_convergence(ax, path, method):
+    ax.plot([y for _, y, _, _ in path], label=method, marker='X')
+    ax.set_xlabel("iteration")
+    ax.set_ylabel("objective")
+    ax.set_yscale('log')
 

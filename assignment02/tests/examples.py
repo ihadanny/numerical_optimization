@@ -1,7 +1,7 @@
 import numpy as np
 
 def q(x, Q):
-    return x.T @ Q @ x, Q @ x, 2 * Q
+    return x.T @ Q @ x, 2 * Q @ x, 2 * Q
 
 def q1(x):
     Q = np.array([[1, 0], [0, 1]])
