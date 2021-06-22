@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
+def col_v(v):
+    return np.array([v]).T
+
 def report(i, pk, x1, y1, delta_x, delta_y, alpha):
     print(f"i={i}: pk={pk}, f({x1})={y1}, dx={delta_x}, dy={delta_y}, alpha={alpha}")
 

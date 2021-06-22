@@ -26,10 +26,15 @@ def rosen(x):
     ])
     return 100*(x2-x1**2)**2 + (1-x1)**2, grad, hess
 
-def l(x, a):
-    return a.T @ x, a, 0
+def l(x, a, r=0):
+    return np.asscalar(a.T @ x + r), a, 0
 
 def l1(x):
     a = np.array([25, 8])
     return l(x, a)
 
+def quad(x, P, q, r):    
+    return np.asscalar(x.T @ P @ x + q.T @ x + r), 2 * P @ x + q, 2 * P
+
+def qp(x):
+    return quad(x, np.eye(3), np.array([0, 0, 2]).reshape(-1, 1), 1)
