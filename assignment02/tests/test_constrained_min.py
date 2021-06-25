@@ -31,7 +31,7 @@ class TestConstrainedMin(unittest.TestCase):
         ax.scatter(xs=[p[0] for p in points[-1:]], ys=[p[1] for p in points[-1:]], zs=[p[2] for p in points[-1:]],
             label=f'end ({points[-1][0]:.2f}, {points[-1][1]:.2f}, {points[-1][2]:.2f})', color='red')
         ax.scatter(xs=[p[0] for p in outer_points], ys=[p[1] for p in outer_points], zs=[p[2] for p in outer_points],
-            label='outer_iteration', color='orange')
+            label='outer_iteration', color='orange', alpha=0.2)
         plt.legend()
         plt.show()
 
@@ -45,19 +45,31 @@ class TestConstrainedMin(unittest.TestCase):
         eq_constraints_mat = None
         eq_constraints_rhs = None
         x0 = utils.col_v([0.5, 0.75])
-        f = partial(examples.l, a=utils.col_v([1, 1]))
+        f = partial(examples.l, a=utils.col_v([-1, -1]))
         path = constrained_min.interior_pt(
             f, ineq_constraints, 
             eq_constraints_mat, eq_constraints_rhs, x0)
         points = [p[0].T[0] for p in path]
-        zs = [f(p)[0] for p in points]
+        zs = [-f(p)[0] for p in points]
         outer_points = [p[0].T[0] for p in path if p[2] == 'outer']     
-        outer_zs = [f(p)[0] for p in outer_points]
+        outer_zs = [-f(p)[0] for p in outer_points]
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('objective')
+
+        y = np.linspace(0, 3, 10)
+        z = np.linspace(0, 3, 10)
+        Y, Z = np.meshgrid(y, z)
+        X = np.ones_like(Y)*2
+        ax.plot_wireframe(X, Y, Z, color='black')
+        x = np.linspace(0, 3, 10)
+        z = np.linspace(0, 3, 10)
+        X, Z = np.meshgrid(x, z)
+        Y = np.ones_like(X)*1
+        ax.plot_wireframe(X, Y, Z, color='black')
+
         ax.plot(xs=[p[0] for p in points], ys=[p[1] for p in points], zs=zs)
         ax.scatter(xs=[p[0] for p in points[:1]], ys=[p[1] for p in points[:1]], zs=zs[:1],
             label=f'start ({points[0][0]:.2f}, {points[0][1]:.2f})', color='green')

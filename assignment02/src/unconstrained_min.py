@@ -37,6 +37,6 @@ def newton_dir(grad0, hess0):
 
 def find_wolfe_step_size(f, xk, pk, grad0, init_step_len, slope_ratio, back_track_factor):
     alpha = init_step_len
-    while f(xk + alpha * pk)[0] > f(xk)[0] + slope_ratio * alpha * grad0.T @ pk:
+    while np.isnan(f(xk + alpha * pk)[0]) or f(xk + alpha * pk)[0] > f(xk)[0] + slope_ratio * alpha * grad0.T @ pk:
         alpha = back_track_factor * alpha
     return alpha
